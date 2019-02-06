@@ -25,6 +25,10 @@ class Queue:
     def sortQueue(self):
         self.queue.sort(key=lambda x: x[2], reverse=True)
 
+    def ortsnamen_in_q(self):
+        for item in self.queue:
+            print("Ort: {} - Kosten: {} ".format(item[1].state, item[2]))
+
 for ort in gNode.graph:
     print(ort)
 
@@ -44,18 +48,18 @@ while weiter:
     queue.enqueue((None, start_ort, start_ort.path_cost))
 
     while queue.size() > 0:
-        vorgaenger, ort_node, kosten = queue.dequeue()
-        if ort_node.state in besucht and besucht[ort_node.state] < kosten:
+        vorgaenger, aktueller_ort, kosten = queue.dequeue()
+        if aktueller_ort.state in besucht and besucht[aktueller_ort.state] < kosten:
             continue
 
-        if ort_node.is_goal_node(ziel):
+        if aktueller_ort.is_goal_node(ziel):
             print("Route")
-            print("Gesamt km: "+ str(ort_node.path_cost))
+            print("Gesamt km: " + str(aktueller_ort.path_cost))
 
-            pfad.append(ort_node.state)
-            while ort_node.parent != None:
-                pfad.append(ort_node.parent.state)
-                ort_node = ort_node.parent
+            pfad.append(aktueller_ort.state)
+            while aktueller_ort.parent is not None:
+                pfad.append(aktueller_ort.parent.state)
+                aktueller_ort = aktueller_ort.parent
 
             pfad.reverse()
             for ort_pfad in pfad:
@@ -63,13 +67,20 @@ while weiter:
 
             break
 
-        nachfolger = ort_node.get_child_nodes()
+        nachfolger = aktueller_ort.get_child_nodes()
 
         for nachf in nachfolger:
             if nachf.state not in besucht:
-                queue.enqueue( (nachf.parent, nachf, nachf.path_cost+kosten) )
+                queue.enqueue( (nachf.parent, nachf, nachf.path_cost) )
 
         queue.sortQueue()
-        besucht[ort_node.state] = ort_node.path_cost
+        queue.ortsnamen_in_q()
+        print("\nBereits besucht: ")
+        besucht[aktueller_ort.state] = aktueller_ort.path_cost
+
+        for besuchter_ort in besucht:
+            print(besuchter_ort, end=' ')
+
+        print("\n--------")
 
     weiter = True if input("\n\nWeiter? J/N ").lower() == "j" else False
